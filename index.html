@@ -157,33 +157,51 @@
             return Math.round(decimal * denominator) / denominator;
         }
 
+function roundToNearestFraction(decimal, denominator) {
+    return Math.round(decimal * denominator) / denominator;
+}
+
 function toConstructionFraction(decimal) {
     if (decimal == 0) return '0';
     const wholePart = Math.floor(decimal);
     let fractionalPart = decimal - wholePart;
     
-    if (fractionalPart < 1/256) {
+    if (fractionalPart < 1/512) {  // Using 1/512 as the threshold for rounding to 0
         return wholePart.toString();
     }
     
     const fractions = [2, 4, 8, 16, 32, 64, 128, 256];
-    for (let i = 0; i < fractions.length; i++) {
-        const roundedFraction = roundToNearestFraction(fractionalPart, fractions[i]);
-        if (Math.abs(roundedFraction - fractionalPart) < 1 / (fractions[i] * 2)) {
-            if (roundedFraction === 1) {
-                return (wholePart + 1).toString();
-            }
-            const numerator = Math.round(roundedFraction * fractions[i]);
-            if (numerator === 0) {
-                return wholePart.toString();
-            }
-            return wholePart > 0 ? `${wholePart} ${numerator}/${fractions[i]}` : `${numerator}/${fractions[i]}`;
+    let bestFraction = { numerator: 0, denominator: 256 };
+    let smallestError = Infinity;
+
+    for (let denominator of fractions) {
+        const rounded = roundToNearestFraction(fractionalPart, denominator);
+        const error = Math.abs(rounded - fractionalPart);
+        
+        if (error < smallestError) {
+            smallestError = error;
+            bestFraction = {
+                numerator: Math.round(rounded * denominator),
+                denominator: denominator
+            };
         }
     }
-    
-    // If we get here, round to the nearest 1/256
-    const numerator = Math.round(fractionalPart * 256);
-    return wholePart > 0 ? `${wholePart} ${numerator}/256` : `${numerator}/256`;
+
+    if (bestFraction.numerator === 0) {
+        return wholePart.toString();
+    }
+
+    // Simplify the fraction
+    const gcd = (a, b) => b ? gcd(b, a % b) : a;
+    const divisor = gcd(bestFraction.numerator, bestFraction.denominator);
+    bestFraction.numerator /= divisor;
+    bestFraction.denominator /= divisor;
+
+    if (wholePart > 0) {
+        return `${wholePart} ${bestFraction.numerator}/${bestFraction.denominator}`;
+    } else {
+        return `${bestFraction.numerator}/${bestFraction.denominator}`;
+    }
 }
 
 function formatResult(feet, inches) {
