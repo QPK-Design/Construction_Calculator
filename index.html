@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #e74c3c;
+        }
+        h2 {
+            color: #e74c3c;
+            font-size: 20px;
+        }
+        .calculator, .converter, .history, .feet-inches-converter {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .calc-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .calc-input {
+            display: flex;
+            align-items: center;
+        }
+        input, select {
+            margin: 0 5px;
+            padding: 5px;
+        }
+        input[type="number"], input[type="text"] {
+            width: 80px;
+        }
+        select {
+            width: 50px;
+        }
+        button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        button:hover {
+            background-color: #c0392b;
+        }
+        #history {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Construction Calculator</h1>
+    
+    <div class="calculator">
+        <h2>Feet and Inches Calculator</h2>
+        <div class="calc-row">
+            <div class="calc-input">
+                <input type="number" id="feet1" placeholder="Feet"> feet
+                <input type="text" id="inches1" placeholder="Inches"> inches
+            </div>
+            <select id="operation">
+                <option value="+">+</option>
+                <option value="-">-</option>
+                <option value="*">×</option>
+                <option value="/">÷</option>
+            </select>
+            <div class="calc-input">
+                <input type="number" id="feet2" placeholder="Feet"> feet
+                <input type="text" id="inches2" placeholder="Inches"> inches
+            </div>
+            <button id="calculateBtn">Calculate</button>
+        </div>
+        <p id="result"></p>
+    </div>
+
+    <div class="converter">
+        <h2>Standard to Metric Converter</h2>
+        <div class="calc-row">
+            <div class="calc-input">
+                <input type="number" id="feetToConvert" placeholder="Feet"> feet
+                <input type="text" id="inchesToConvert" placeholder="Inches"> inches
+            </div>
+            <button id="convertBtn">Convert to Metric</button>
+        </div>
+        <p id="metricResult"></p>
+    </div>
+
+    <div class="feet-inches-converter">
+        <h2>Feet and Inches to Metric Converter</h2>
+        <div class="calc-row">
+            <input type="text" id="feetAndInches" placeholder="e.g., 5'-3 1/2&quot;">
+            <button id="convertToMetricBtn">Convert to Metric</button>
+        </div>
+        <p id="feetInchesMetricResult"></p>
+    </div>
+
+    <div class="history">
+        <h2>Calculation History</h2>
+        <div id="history"></div>
+        <button id="clearHistoryBtn">Clear History</button>
+    </div>
+
+    <script>
+        let calculationHistory = [];
+
+        function addToHistory(calculation) {
+            calculationHistory.push(calculation);
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyElement = document.getElementById('history');
+            historyElement.innerHTML = calculationHistory.map(calc => `<p>${calc}</p>`).join('');
+        }
+
+        function clearHistory() {
+            calculationHistory = [];
+            updateHistoryDisplay();
+        }
+
+        function parseFractionalInput(input) {
+            input = input.trim();
+            let total = 0;
+            let parts = input.split(' ');
+            
+            for (let part of parts) {
+                if (part.includes('/')) {
+                    let [numerator, denominator] = part.split('/').map(num => parseFloat(num.trim()));
+                    total += numerator / denominator;
+                } else {
+                    total += parseFloat(part) || 0;
+                }
+            }
+            
+            return total;
+        }
+
+        function roundToNearestFraction(decimal, denominator) {
+            return Math.round(decimal * denominator) / denominator;
+        }
+
+        function toConstructionFraction(decimal) {
+            if (decimal == 0) return '0';
+            const wholePart = Math.floor(decimal);
+            let fractionalPart = decimal - wholePart;
+            
+            const fractions = [2, 4, 8, 16, 32, 64, 128, 256];
+            for (let i = 0; i < fractions.length; i++) {
+                const roundedFraction = roundToNearestFraction(fractionalPart, fractions[i]);
+                if (Math.abs(roundedFraction - fractionalPart) < 1 / (fractions[i] * 2)) {
+                    if (roundedFraction === 1) {
+                        return (wholePart + 1).toString();
+                    }
+                    const numerator = Math.round(roundedFraction * fractions[i]);
+                    return wholePart > 0 ? `${wholePart} ${numerator}/${fractions[i]}` : `${numerator}/${fractions[i]}`;
+                }
+            }
+            
+            // If we get here, round to the nearest 1/256
+            const numerator = Math.round(fractionalPart * 256);
+            return wholePart > 0 ? `${wholePart} ${numerator}/256` : `${numerator}/256`;
+        }
+
+        function formatResult(feet, inches) {
+            const wholeFeet = Math.floor(feet);
+            const totalInches = (feet - wholeFeet) * 12 + inches;
+            const wholeInches = Math.floor(totalInches);
+            const fractionalInches = totalInches - wholeInches;
+            
+            let result = `${wholeFeet}'`;
+            if (wholeInches > 0 || fractionalInches > 0) {
+                result += `-${toConstructionFraction(totalInches)}"`;
+            }
+            return result;
+        }
+
+        function calculate() {
+            const feet1 = parseFloat(document.getElementById('feet1').value) || 0;
+            const inches1 = parseFractionalInput(document.getElementById('inches1').value);
+            const feet2 = parseFloat(document.getElementById('feet2').value) || 0;
+            const inches2 = parseFractionalInput(document.getElementById('inches2').value);
+            const operation = document.getElementById('operation').value;
+
+            const totalInches1 = feet1 * 12 + inches1;
+            const totalInches2 = feet2 * 12 + inches2;
+
+            let result;
+            switch (operation) {
+                case '+':
+                    result = totalInches1 + totalInches2;
+                    break;
+                case '-':
+                    result = totalInches1 - totalInches2;
+                    break;
+                case '*':
+                    result = totalInches1 * totalInches2;
+                    break;
+                case '/':
+                    result = totalInches1 / totalInches2;
+                    break;
+            }
+
+            const resultFeet = Math.floor(result / 12);
+            const resultInches = result % 12;
+
+            const resultText = `Result: ${formatResult(resultFeet, resultInches)}`;
+            document.getElementById('result').textContent = resultText;
+
+            const calculationText = `${formatResult(feet1, inches1)} ${operation} ${formatResult(feet2, inches2)} = ${formatResult(resultFeet, resultInches)}`;
+            addToHistory(calculationText);
+        }
+
+        function convertToMetric() {
+            const feet = parseFloat(document.getElementById('feetToConvert').value) || 0;
+            const inches = parseFractionalInput(document.getElementById('inchesToConvert').value);
+
+            const totalInches = feet * 12 + inches;
+            const totalCentimeters = totalInches * 2.54;
+
+            const meters = Math.floor(totalCentimeters / 100);
+            const centimeters = totalCentimeters % 100;
+
+            const resultText = `Result: ${meters} meters and ${centimeters.toFixed(2)} centimeters`;
+            document.getElementById('metricResult').textContent = resultText;
+
+            const conversionText = `${formatResult(feet, inches)} = ${meters}m ${centimeters.toFixed(2)}cm`;
+            addToHistory(conversionText);
+        }
+
+        function parseFeetAndInches(input) {
+            const regex = /^(\d+)'?-?\s*(\d+\s+(\d+\/\d+)?"?|\d+\/\d+"?|(\d+\/\d+)"?)$/;
+            const match = input.match(regex);
+            
+            if (!match) {
+                throw new Error("Invalid input format");
+            }
+            
+            let feet = parseInt(match[1]) || 0;
+            let inches = 0;
+            
+            if (match[2]) {
+                if (match[2].includes("/")) {
+                    inches = parseFractionalInput(match[2]);
+                } else {
+                    inches = parseInt(match[2]);
+                    if (match[3]) {
+                        inches += parseFractionalInput(match[3]);
+                    }
+                }
+            }
+            
+            return feet * 12 + inches;
+        }
+
+        function convertFeetAndInchesToMetric() {
+            try {
+                const input = document.getElementById('feetAndInches').value;
+                const totalInches = parseFeetAndInches(input);
+                const totalCentimeters = totalInches * 2.54;
+
+                const meters = Math.floor(totalCentimeters / 100);
+                const centimeters = totalCentimeters % 100;
+
+                const resultText = `Result: ${meters} meters and ${centimeters.toFixed(2)} centimeters`;
+                document.getElementById('feetInchesMetricResult').textContent = resultText;
+
+                const formattedInput = formatResult(Math.floor(totalInches / 12), totalInches % 12);
+                const conversionText = `${formattedInput} = ${meters}m ${centimeters.toFixed(2)}cm`;
+                addToHistory(conversionText);
+            } catch (error) {
+                document.getElementById('feetInchesMetricResult').textContent = "Error: " + error.message;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('calculateBtn').addEventListener('click', calculate);
+            document.getElementById('convertBtn').addEventListener('click', convertToMetric);
+            document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+            document.getElementById('convertToMetricBtn').addEventListener('click', convertFeetAndInchesToMetric);
+        });
+    </script>
+</body>
+</html>
