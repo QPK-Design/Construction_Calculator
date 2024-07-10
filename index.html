@@ -161,12 +161,14 @@ function toConstructionFraction(decimal) {
     if (decimal == 0) return '0';
     const wholePart = Math.floor(decimal);
     let fractionalPart = decimal - wholePart;
-    
-    if (fractionalPart < 1/16) {
+
+    //Controls the minimum unit to round to
+    if (fractionalPart < 1/256) {
         return wholePart.toString();
     }
-    
-    const fractions = [2, 4, 8, 16];
+
+    //Controls the fractional options available in the answer
+    const fractions = [2, 4, 8, 16, 32, 64, 128, 256];
     for (let i = 0; i < fractions.length; i++) {
         const roundedFraction = roundToNearestFraction(fractionalPart, fractions[i]);
         if (Math.abs(roundedFraction - fractionalPart) < 1 / (fractions[i] * 2)) {
