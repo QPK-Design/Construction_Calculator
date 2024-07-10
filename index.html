@@ -157,40 +157,51 @@
             return Math.round(decimal * denominator) / denominator;
         }
 
-        function toConstructionFraction(decimal) {
-            if (decimal == 0) return '0';
-            const wholePart = Math.floor(decimal);
-            let fractionalPart = decimal - wholePart;
-            
-            const fractions = [2, 4, 8, 16, 32, 64, 128, 256];
-            for (let i = 0; i < fractions.length; i++) {
-                const roundedFraction = roundToNearestFraction(fractionalPart, fractions[i]);
-                if (Math.abs(roundedFraction - fractionalPart) < 1 / (fractions[i] * 2)) {
-                    if (roundedFraction === 1) {
-                        return (wholePart + 1).toString();
-                    }
-                    const numerator = Math.round(roundedFraction * fractions[i]);
-                    return wholePart > 0 ? `${wholePart} ${numerator}/${fractions[i]}` : `${numerator}/${fractions[i]}`;
-                }
+function toConstructionFraction(decimal) {
+    if (decimal == 0) return '0';
+    const wholePart = Math.floor(decimal);
+    let fractionalPart = decimal - wholePart;
+    
+    if (fractionalPart < 1/16) {
+        return wholePart.toString();
+    }
+    
+    const fractions = [2, 4, 8, 16];
+    for (let i = 0; i < fractions.length; i++) {
+        const roundedFraction = roundToNearestFraction(fractionalPart, fractions[i]);
+        if (Math.abs(roundedFraction - fractionalPart) < 1 / (fractions[i] * 2)) {
+            if (roundedFraction === 1) {
+                return (wholePart + 1).toString();
             }
-            
-            // If we get here, round to the nearest 1/256
-            const numerator = Math.round(fractionalPart * 256);
-            return wholePart > 0 ? `${wholePart} ${numerator}/256` : `${numerator}/256`;
+            const numerator = Math.round(roundedFraction * fractions[i]);
+            if (numerator === 0) {
+                return wholePart.toString();
+            }
+            return wholePart > 0 ? `${wholePart} ${numerator}/${fractions[i]}` : `${numerator}/${fractions[i]}`;
         }
+    }
+    
+    // If we get here, round to the nearest 1/16
+    const numerator = Math.round(fractionalPart * 16);
+    return wholePart > 0 ? `${wholePart} ${numerator}/16` : `${numerator}/16`;
+}
 
-        function formatResult(feet, inches) {
-            const wholeFeet = Math.floor(feet);
-            const totalInches = (feet - wholeFeet) * 12 + inches;
-            const wholeInches = Math.floor(totalInches);
-            const fractionalInches = totalInches - wholeInches;
-            
-            let result = `${wholeFeet}'`;
-            if (wholeInches > 0 || fractionalInches > 0) {
-                result += `-${toConstructionFraction(totalInches)}"`;
-            }
-            return result;
-        }
+function formatResult(feet, inches) {
+    const wholeFeet = Math.floor(feet);
+    const totalInches = (feet - wholeFeet) * 12 + inches;
+    const wholeInches = Math.floor(totalInches);
+    const fractionalInches = totalInches - wholeInches;
+    
+    let result = '';
+    if (wholeFeet > 0) {
+        result += `${wholeFeet}'`;
+    }
+    if (wholeInches > 0 || fractionalInches > 0) {
+        if (result) result += '-';
+        result += toConstructionFraction(totalInches % 12) + '"';
+    }
+    return result || '0"';
+}
 
         function calculate() {
             const feet1 = parseFloat(document.getElementById('feet1').value) || 0;
