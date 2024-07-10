@@ -161,13 +161,11 @@ function toConstructionFraction(decimal) {
     if (decimal == 0) return '0';
     const wholePart = Math.floor(decimal);
     let fractionalPart = decimal - wholePart;
-
-    //Controls the minimum unit to round to
+    
     if (fractionalPart < 1/256) {
         return wholePart.toString();
     }
-
-    //Controls the fractional options available in the answer
+    
     const fractions = [2, 4, 8, 16, 32, 64, 128, 256];
     for (let i = 0; i < fractions.length; i++) {
         const roundedFraction = roundToNearestFraction(fractionalPart, fractions[i]);
@@ -183,9 +181,9 @@ function toConstructionFraction(decimal) {
         }
     }
     
-    // If we get here, round to the nearest 1/16
-    const numerator = Math.round(fractionalPart * 16);
-    return wholePart > 0 ? `${wholePart} ${numerator}/16` : `${numerator}/16`;
+    // If we get here, round to the nearest 1/256
+    const numerator = Math.round(fractionalPart * 256);
+    return wholePart > 0 ? `${wholePart} ${numerator}/256` : `${numerator}/256`;
 }
 
 function formatResult(feet, inches) {
