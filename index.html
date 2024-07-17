@@ -112,6 +112,24 @@
         <p id="feetInchesMetricResult"></p>
     </div>
 
+    <div class="slope calculator">
+        <h2>Slope Calculator</h2>
+        <div class="calc-row">
+            <div class="calc-input">
+                <label for="slopeRiseFeet">Rise:</label>
+                <input type="number" id="slopeRiseFeet" placeholder="Feet"> feet
+                <input type="text" id="slopeRiseInches" placeholder="Inches"> inches
+            </div>
+            <div class="calc-input">
+                <label for="slopeRunFeet">Run:</label>
+                <input type="number" id="slopeRunFeet" placeholder="Feet"> feet
+                <input type="text" id="slopeRunInches" placeholder="Inches"> inches
+            </div>
+            <button id="calculateSlopeBtn">Calculate Slope</button>
+        </div>
+        <pre id="slopeResult"></pre>
+    </div>
+
     <div class="history">
         <h2>Calculation History</h2>
         <div id="history"></div>
@@ -319,11 +337,52 @@ function formatResult(feet, inches) {
             }
         }
 
+        function calculateSlope() {
+            const riseFeet = parseFloat(document.getElementById('slopeRiseFeet').value) || 0;
+            const riseInches = parseFractionalInput(document.getElementById('slopeRiseInches').value);
+            const runFeet = parseFloat(document.getElementById('slopeRunFeet').value) || 0;
+            const runInches = parseFractionalInput(document.getElementById('slopeRunInches').value);
+
+            const totalRiseInches = riseFeet * 12 + riseInches;
+            const totalRunInches = runFeet * 12 + runInches;
+
+            if (totalRiseInches <= 0 || totalRunInches <= 0) {
+                document.getElementById('slopeResult').textContent = "Please enter valid positive numbers for rise and run.";
+                return;
+            }
+
+            const slope = totalRiseInches / totalRunInches;
+            const slopePercentage = slope * 100;
+            const slopeAngle = Math.atan(slope) * (180 / Math.PI);
+            const slopeRatio = 1 / slope;
+
+            let railingsNeeded = "No";
+            let adaCompliant = "Yes, ramp ratio is less than 1:12";
+            if (slope > 1/20) {
+                railingsNeeded = "Yes";
+                if (slope > 1/12) {
+                    adaCompliant = `No, ramp ratio (1:${slopeRatio.toFixed(2)}) exceeds 1:12`;
+                } else {
+                    adaCompliant = `Yes, ramp ratio (1:${slopeRatio.toFixed(2)}) is between 1:12 and 1:20`;
+                }
+            } else {
+                adaCompliant = `Yes, ramp ratio (1:${slopeRatio.toFixed(2)}) is less than 1:20`;
+            }
+
+            const resultText = `Slope Percentage: ${slopePercentage.toFixed(1)}%
+Slope Angle: ${slopeAngle.toFixed(1)}°
+Railings Needed: ${railingsNeeded}
+ADA Compliant: ${adaCompliant}`;
+
+            document.getElementById('slopeResult').textContent = resultText;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('calculateBtn').addEventListener('click', calculate);
             document.getElementById('convertBtn').addEventListener('click', convertToMetric);
             document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
             document.getElementById('convertToMetricBtn').addEventListener('click', convertFeetAndInchesToMetric);
+            document.getElementById('calculateSlopeBtn').addEventListener('click', calculateSlope);
         });
     </script>
 </body>
