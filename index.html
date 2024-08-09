@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Construction Calculator</title>
+    <title>Architecture Calculators</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 1000px;
+            max-width: 1920px;
             margin: 0 auto;
             padding: 20px;
             box-sizing: border-box;
@@ -67,27 +67,30 @@
     </style>
 </head>
 <body>
-    <h1>Construction Calculator</h1>
+    <h1>Architecture Calculators</h1>
     
     <div class="calculator">
         <h2>Feet and Inches Calculator</h2>
         <div class="calc-row">
             <div class="calc-input">
-                <input type="number" id="feet1" placeholder="Feet"> feet
-                <input type="text" id="inches1" placeholder="Inches"> inches
+                <input type="number" id="feet1" placeholder="Feet"> ft
+                <input type="text" id="inches1" placeholder="Inches"> in
             </div>
+        </div>
+            <div class="calc-row">
             <select id="operation">
                 <option value="+">+</option>
                 <option value="-">-</option>
                 <option value="*">×</option>
                 <option value="/">÷</option>
             </select>
+            </div>
             <div class="calc-input">
-                <input type="number" id="feet2" placeholder="Feet"> feet
-                <input type="text" id="inches2" placeholder="Inches"> inches
+                <input type="number" id="feet2" placeholder="Feet"> ft
+                <input type="text" id="inches2" placeholder="Inches"> in
             </div>
             <button id="calculateBtn">Calculate</button>
-        </div>
+        
         <p id="result"></p>
     </div>
 
@@ -95,8 +98,8 @@
         <h2>Standard to Metric Converter</h2>
         <div class="calc-row">
             <div class="calc-input">
-                <input type="number" id="feetToConvert" placeholder="Feet"> feet
-                <input type="text" id="inchesToConvert" placeholder="Inches"> inches
+                <input type="number" id="feetToConvert" placeholder="Feet"> ft
+                <input type="text" id="inchesToConvert" placeholder="Inches"> in
             </div>
             <button id="convertBtn">Convert to Metric</button>
         </div>
@@ -107,8 +110,8 @@
         <h2>Feet and Inches to Decimal Feet</h2>
         <div class="calc-row">
             <div class="calc-input">
-                <input type="number" id="feet" placeholder="Feet"> feet
-                <input type="number" id="inches" placeholder="Inches"> inches
+                <input type="number" id="feet" placeholder="Feet"> ft
+                <input type="number" id="inches" placeholder="Inches"> in
             </div>
             <button id="convertToDecimalFeetBtn">Convert to Decimal Feet</button>
         </div>
@@ -120,18 +123,39 @@
         <div class="calc-row">
             <div class="calc-input">
                 <label for="slopeRiseFeet">Rise:</label>
-                <input type="number" id="slopeRiseFeet" placeholder="Feet"> feet
-                <input type="text" id="slopeRiseInches" placeholder="Inches"> inches
+                <input type="number" id="slopeRiseFeet" placeholder="Feet"> ft
+                <input type="text" id="slopeRiseInches" placeholder="Inches"> in
             </div>
             <div class="calc-input">
                 <label for="slopeRunFeet">Run:</label>
-                <input type="number" id="slopeRunFeet" placeholder="Feet"> feet
-                <input type="text" id="slopeRunInches" placeholder="Inches"> inches
+                <input type="number" id="slopeRunFeet" placeholder="Feet"> ft
+                <input type="text" id="slopeRunInches" placeholder="Inches"> in
             </div>
             <button id="calculateSlopeBtn">Calculate Slope</button>
         </div>
-        <pre id="slopeResult"></pre>
+        <div id="slopeResult"></div>
     </div>
+
+    <div class="calculator">
+        <h2>Stair Calculator</h2>
+        <div class="calc-row">
+            <div class="calc-input">
+                <label for="totalRiseFeet">Floor to Floor Height:</label>
+                <input type="number" id="totalRiseFeet" min="0"> ft
+                <input type="number" id="totalRiseInches" min="0" max="11"> in
+            </div>
+            <div class="calc-input">
+                <label for="runWidthFeet">Egress Width Required Per Code:</label>
+                <input type="number" id="runWidthFeet" min="0"> ft
+                <input type="number" id="runWidthInches" min="0" max="11"> in
+            </div>
+            <button onclick="calculateStairs()">Calculate Stairs</button>
+        </div>
+        <div class="calc-row">
+            <div id="stairResult"></div>
+        </div>
+    </div>
+    
 
     <div class="history">
         <h2>Calculation History</h2>
@@ -272,8 +296,8 @@ function formatResult(feet, inches) {
             const resultFeet = Math.floor(result / 12);
             const resultInches = result % 12;
 
-            const resultText = `Result: ${formatResult(resultFeet, resultInches)}`;
-            document.getElementById('result').textContent = resultText;
+            const resultText = `<span style="color: black;">Result: <span style="color: red;">${formatResult(resultFeet, resultInches)}`;
+            document.getElementById('result').innerHTML = resultText;
 
             const calculationText = `${formatResult(feet1, inches1)} ${operation} ${formatResult(feet2, inches2)} = ${formatResult(resultFeet, resultInches)}`;
             addToHistory(calculationText);
@@ -291,10 +315,10 @@ function formatResult(feet, inches) {
             const millimeters = inches * 25.4;
             const kilometers = meters / 1000;
 
-            const resultText = `Result:<br>${feet}'-${inches}" = ${millimeters.toFixed(Math.max(1, getDecimalPlaces(millimeters)))} mm<br>
-            ${feet}'-${inches}" = ${centimeters.toFixed(Math.max(1, getDecimalPlaces(centimeters)))} cm<br>
-            ${feet}'-${inches}" = ${meters.toFixed(Math.max(1, getDecimalPlaces(meters)))} m<br>
-            ${feet}'-${inches}" = ${(meters / 1000).toFixed(Math.max(1, getDecimalPlaces(meters / 1000)))} km`;
+            const resultText = `<span style="color: black;">Result:<br>${feet}'-${inches}" = <span style="color: red;">${millimeters.toFixed(Math.max(1, getDecimalPlaces(millimeters)))} mm
+            <br><span style="color: black;">or <span style="color: red;">${centimeters.toFixed(Math.max(1, getDecimalPlaces(centimeters)))} cm
+            <br><span style="color: black;">or <span style="color: red;">${meters.toFixed(Math.max(1, getDecimalPlaces(meters)))} m
+            <br><span style="color: black;">or <span style="color: red;">${(meters / 1000).toFixed(Math.max(1, getDecimalPlaces(meters / 1000)))} km`;
             document.getElementById('metricResult').innerHTML = resultText;
 
             const conversionText = `${formatResult(feet, inches)} = ${meters.toFixed(Math.max(1, getDecimalPlaces(meters)))}m ${centimeters.toFixed(Math.max(1, getDecimalPlaces(centimeters)))}cm`;
@@ -363,8 +387,8 @@ function formatResult(feet, inches) {
             const feet = parseFloat(document.getElementById('feet').value) || 0;
             const inches = parseFloat(document.getElementById('inches').value) || 0;
             const decimalFeet = feet + (inches / 12);
-            const resultText = `Result: ${decimalFeet.toFixed(2)} ft`;
-            document.getElementById('decimal-feet-result').textContent = resultText;
+            const resultText = `<span style="color: black;">Result:<span style="color: red;">${decimalFeet.toFixed(2)} ft`;
+            document.getElementById('decimal-feet-result').innerHTML = resultText;
 
             const conversionText = `${feet}'-${inches}" = ${decimalFeet.toFixed(2)} ft`;
             addToHistory(conversionText);
@@ -402,12 +426,69 @@ function formatResult(feet, inches) {
                 adaCompliant = `Yes, ramp ratio (1:${slopeRatio.toFixed(2)}) is less than 1:20`;
             }
 
-            const resultText = `Slope Percentage: ${slopePercentage.toFixed(1)}%
-Slope Angle: ${slopeAngle.toFixed(1)}°
-Railings Needed: ${railingsNeeded}
-ADA Compliant: ${adaCompliant}`;
+            document.getElementById('slopeResult').innerHTML = `
+                <span style="color: black;">Slope as a Percentage: <span style="color: red;">${slopePercentage.toFixed(1)}%
+                <br><span style="color: black;">Slope Angle: <span style="color: red;">${slopeAngle.toFixed(1)}°
+                <br><span style="color: black;">Railings Needed?: <span style="color: red;">${railingsNeeded}
+                <br><span style="color: black;">ADA Compliant?: <span style="color: red;">${adaCompliant}
+            `;
+        }
 
-            document.getElementById('slopeResult').textContent = resultText;
+        function calculateStairs() {
+            const totalRiseFeet = parseFloat(document.getElementById('totalRiseFeet').value) || 0;
+            const totalRiseInches = parseFloat(document.getElementById('totalRiseInches').value) || 0;
+            const runWidthFeet = parseFloat(document.getElementById('runWidthFeet').value) || 0;
+            const runWidthInches = parseFloat(document.getElementById('runWidthInches').value) || 0;
+
+            const totalRiseInInches = (totalRiseFeet * 12) + totalRiseInches;
+            const runWidthInInches = (runWidthFeet * 12) + runWidthInches;
+
+            const maxRiserHeight = 7;
+            const treadDepth = 11;
+
+            const numberOfSteps = Math.ceil(totalRiseInInches / maxRiserHeight);
+            const actualRiserHeight = totalRiseInInches / numberOfSteps;
+
+            const totalRun = numberOfSteps * treadDepth;
+            const numberOfLandings = Math.floor(totalRiseInInches / (12 * 12)); // 12 feet vertically before landing is added
+            const totalRunWithLandings = totalRun + (numberOfLandings * runWidthInInches);
+
+            document.getElementById('stairResult').innerHTML = `
+                <span style="color: black;">Number of Risers: <span style="color: red;">${numberOfSteps}
+                <br><span style="color: black;">Riser height: <span style="color: red;">${formatFractionalInches(actualRiserHeight)}
+                <br><span style="color: black;">Tread depth: <span style="color: red;">11 inches
+                <br>
+                <br><span style="color: black;">Single Run Stair Width (Egress Width):<span style="color: red;">${formatFeetAndInches(runWidthInInches)}
+                <br><span style="color: black;">---or---
+                <br><span style="color: black;">Switchback Stair Shaft Width (Egress Width + 6" Between Runs):<span style="color: red;">${formatFeetAndInches((runWidthInInches*2)+6)}                    
+                <br>
+                <br><span style="color: black;">Run Length Without Landings:<span style="color: red;">${formatFeetAndInches(totalRun)}
+                <br><span style="color: black;">Number of Landings Required:<span style="color: red;">${numberOfLandings} at ${formatFeetAndInches(runWidthInInches)} = ${formatFeetAndInches(numberOfLandings*runWidthInInches)}
+                <br><span style="color: black;">Run Length Including Landings:<span style="color: red;">${formatFeetAndInches(totalRunWithLandings)}
+                <br><span style="color: black;">---or---
+                <br><span style="color: black;">Number of Treads: <span style="color: red;">${Math.ceil(numberOfSteps/2)} plus ${Math.floor(numberOfSteps/2)}
+                <br><span style="color: black;">Switchback Stair Shaft Length (Egress Width + 5" Stringer Return Onto Landing): <span style="color: red;">${formatFeetAndInches((runWidthInInches*2)+10+(Math.ceil(numberOfSteps/2)*11))} (5" might be 3", look at typ dtl)                    
+                <br>
+                <br><span style="color: black;">---Note: All Egress Widths Taken From Outside of Stringers, Typ.
+                `;
+        }
+
+        function formatFeetAndInches(totalInches) {
+            const feet = Math.floor(totalInches / 12);
+            const inches = totalInches % 12;
+            const fractionalInches = formatFractionalInches(inches);
+            return `${feet}'-${fractionalInches}`;
+        }
+
+        function formatFractionalInches(inches) {
+            const wholePart = Math.floor(inches);
+            const fraction = inches - wholePart;
+            const fractionNumerator = Math.round(fraction * 256);
+            const fractionDenominator = 256;
+
+            if (fractionNumerator === 0) {
+                return `${wholePart}"`;
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
