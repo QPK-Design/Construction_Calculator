@@ -21,7 +21,7 @@
             color: #e74c3c;
             font-size: 20px;
         }
-        .calculator, .converter, .history, .feet-inches-converter {
+        .calculator, .converter, .history, .feet-inches-converter, .decimal-feet-converter {
             background-color: #f0f0f0;
             padding: 15px;
             border-radius: 5px;
@@ -103,13 +103,16 @@
         <p id="metricResult"></p>
     </div>
 
-    <div class="feet-inches-converter">
-        <h2>Feet and Inches to Metric Converter</h2>
+    <div class="decimal-feet-converter">
+        <h2>Feet and Inches to Decimal Feet</h2>
         <div class="calc-row">
-            <input type="text" id="feetAndInches" placeholder="e.g., 5'-3 1/2&quot;">
-            <button id="convertToMetricBtn">Convert to Metric</button>
+            <div class="calc-input">
+                <input type="number" id="feet" placeholder="Feet"> feet
+                <input type="number" id="inches" placeholder="Inches"> inches
+            </div>
+            <button id="convertToDecimalFeetBtn">Convert to Decimal Feet</button>
         </div>
-        <p id="feetInchesMetricResult"></p>
+        <p id="decimal-feet-result"></p>
     </div>
 
     <div class="slope calculator">
@@ -132,7 +135,8 @@
 
     <div class="history">
         <h2>Calculation History</h2>
-        <div id="history"></div>
+        <div id="history">
+        </div>
         <button id="clearHistoryBtn">Clear History</button>
     </div>
 
@@ -284,13 +288,31 @@ function formatResult(feet, inches) {
 
             const meters = Math.floor(totalCentimeters / 100);
             const centimeters = totalCentimeters % 100;
+            const millimeters = inches * 25.4;
+            const kilometers = meters / 1000;
 
-            const resultText = `Result: ${meters} meters and ${centimeters.toFixed(2)} centimeters`;
-            document.getElementById('metricResult').textContent = resultText;
+            const resultText = `Result:<br>${feet}'-${inches}" = ${millimeters.toFixed(Math.max(1, getDecimalPlaces(millimeters)))} mm<br>
+            ${feet}'-${inches}" = ${centimeters.toFixed(Math.max(1, getDecimalPlaces(centimeters)))} cm<br>
+            ${feet}'-${inches}" = ${meters.toFixed(Math.max(1, getDecimalPlaces(meters)))} m<br>
+            ${feet}'-${inches}" = ${(meters / 1000).toFixed(Math.max(1, getDecimalPlaces(meters / 1000)))} km`;
+            document.getElementById('metricResult').innerHTML = resultText;
 
-            const conversionText = `${formatResult(feet, inches)} = ${meters}m ${centimeters.toFixed(2)}cm`;
+            const conversionText = `${formatResult(feet, inches)} = ${meters.toFixed(Math.max(1, getDecimalPlaces(meters)))}m ${centimeters.toFixed(Math.max(1, getDecimalPlaces(centimeters)))}cm`;
             addToHistory(conversionText);
-        }
+            }
+
+            function getDecimalPlaces(number) {
+                const stringNumber = number.toString();
+                const decimalIndex = stringNumber.indexOf('.');
+                if (decimalIndex === -1) {
+                    return 0;
+                }
+                return Math.min(10, stringNumber.length - decimalIndex - 1);
+            }
+
+            function roundToNearestFraction(decimal, denominator) {
+                return Math.round(decimal * denominator) / denominator;
+            }
 
         function parseFeetAndInches(input) {
             const regex = /^(\d+)'?-?\s*(\d+\s+(\d+\/\d+)?"?|\d+\/\d+"?|(\d+\/\d+)"?)$/;
@@ -337,6 +359,17 @@ function formatResult(feet, inches) {
             }
         }
 
+        function convertToDecimalFeet() {
+            const feet = parseFloat(document.getElementById('feet').value) || 0;
+            const inches = parseFloat(document.getElementById('inches').value) || 0;
+            const decimalFeet = feet + (inches / 12);
+            const resultText = `Result: ${decimalFeet.toFixed(2)} ft`;
+            document.getElementById('decimal-feet-result').textContent = resultText;
+
+            const conversionText = `${feet}'-${inches}" = ${decimalFeet.toFixed(2)} ft`;
+            addToHistory(conversionText);
+        }
+
         function calculateSlope() {
             const riseFeet = parseFloat(document.getElementById('slopeRiseFeet').value) || 0;
             const riseInches = parseFractionalInput(document.getElementById('slopeRiseInches').value);
@@ -378,12 +411,27 @@ ADA Compliant: ${adaCompliant}`;
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculateBtn');
+            const convertBtn = document.getElementById('convertBtn');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+            const convertToDecimalFeetBtn = document.getElementById('convertToDecimalFeetBtn');
+            const calculateSlopeBtn = document.getElementById('calculateSlopeBtn');
+
+            if (calculateBtn) calculateBtn.addEventListener('click', calculate);
+            if (convertBtn) convertBtn.addEventListener('click', convertToMetric);
+            if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', clearHistory);
+            if (convertToDecimalFeetBtn) convertToDecimalFeetBtn.addEventListener('click', convertToDecimalFeet);
+            if (calculateSlopeBtn) calculateSlopeBtn.addEventListener('click', calculateSlope);
+        
+
+        document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('calculateBtn').addEventListener('click', calculate);
             document.getElementById('convertBtn').addEventListener('click', convertToMetric);
             document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
             document.getElementById('convertToMetricBtn').addEventListener('click', convertFeetAndInchesToMetric);
+            document.getElementById('convertToDecimalFeetBtn').addEventListener('click', convertToDecimalFeet);
             document.getElementById('calculateSlopeBtn').addEventListener('click', calculateSlope);
-        });
+        })});
     </script>
 </body>
 </html>
