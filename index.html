@@ -8,34 +8,60 @@
         body {
             font-family: Arial, sans-serif;
             max-width: 1920px;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 10px;
+            padding: 5px, 10px, 5px, 10px;
             box-sizing: border-box;
         }
         h1 {
             text-align: center;
             font-size: 24px;
             color: #e74c3c;
+            margin: 5px;
         }
         h2 {
             color: #e74c3c;
-            font-size: 20px;
+            font-size: 18px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        h3 {
+            color: #000000;
+            font-size: 16px;  
+            margin-bottom: 2px;
+            margin-top: 2px;
         }
         .calculator, .converter, .history, .feet-inches-converter, .decimal-feet-converter {
             background-color: #f0f0f0;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
         }
         .calc-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         .calc-input {
             display: flex;
             align-items: center;
+        }
+        .fit-columns{
+            display: flex;
+            flex-direction: row;
+        }
+        .column-small{
+            flex: 1;
+            padding: 30px;
+        }
+        .column-large{
+            flex: 1.5;
+            padding: 30px;
+            border-width: 2px;
+            border-style: solid;
+            border-width: 5px, 5px, 5px, 5px;
+            border-color: rgba(0, 0, 0, 0);
+            border-left-color: rgba(0, 0, 0, 0.07);
         }
         input, select {
             margin: 0 5px;
@@ -55,7 +81,8 @@
             cursor: pointer;
             border-radius: 20px;
             font-weight: bold;
-            margin: 5px 0;
+            margin-top: 10px;
+            margin-bottom: 0px;
         }
         button:hover {
             background-color: #c0392b;
@@ -119,15 +146,15 @@
     </div>
 
     <div class="slope calculator">
-        <h2>Slope Calculator</h2>
+        <h2>Ramp Calculator</h2>
         <div class="calc-row">
             <div class="calc-input">
-                <label for="slopeRiseFeet">Rise:</label>
+                <label for="slopeRiseFeet"><h3>Rise:</label></h3>
                 <input type="number" id="slopeRiseFeet" placeholder="Feet"> ft
                 <input type="text" id="slopeRiseInches" placeholder="Inches"> in
             </div>
             <div class="calc-input">
-                <label for="slopeRunFeet">Run:</label>
+                <label for="slopeRunFeet"><h3>Run:</label></h3>
                 <input type="number" id="slopeRunFeet" placeholder="Feet"> ft
                 <input type="text" id="slopeRunInches" placeholder="Inches"> in
             </div>
@@ -140,14 +167,14 @@
         <h2>Stair Calculator</h2>
         <div class="calc-row">
             <div class="calc-input">
-                <label for="totalRiseFeet">Floor to Floor Height:</label>
-                <input type="number" id="totalRiseFeet" min="0"> ft
-                <input type="number" id="totalRiseInches" min="0" max="11"> in
+                <label for="totalRiseFeet"><h3>Floor to Floor Height:</label></h3>
+                <input type="number" id="totalRiseFeet" min="0" placeholder="Feet"> ft
+                <input type="number" id="totalRiseInches" min="0" max="11" placeholder="Inches"> in
             </div>
             <div class="calc-input">
-                <label for="runWidthFeet">Egress Width Required Per Code:</label>
-                <input type="number" id="runWidthFeet" min="0"> ft
-                <input type="number" id="runWidthInches" min="0" max="11"> in
+                <label for="runWidthFeet"><h3>Stair Width:</label></h3>
+                <input type="number" id="runWidthFeet" min="0" placeholder="Feet"> ft
+                <input type="number" id="runWidthInches" min="0" max="11" placeholder="Inches"> in
             </div>
             <button onclick="calculateStairs()">Calculate Stairs</button>
         </div>
@@ -418,7 +445,7 @@ function formatResult(feet, inches) {
             if (slope > 1/20) {
                 railingsNeeded = "Yes";
                 if (slope > 1/12) {
-                    adaCompliant = `No, ramp ratio (1:${slopeRatio.toFixed(2)}) exceeds 1:12`;
+                    adaCompliant = `No, ramp ratio (1:${slopeRatio.toFixed(2)}) exceeds 1:12. If not used as a means of egress ramp can be maximum 1:8 per <a href='https://up.codes/viewer/new_york/ibc-2018/chapter/10/means-of-egress#1012.2' target='_blank'>Building Code Section 1012.2</a>.`;
                 } else {
                     adaCompliant = `Yes, ramp ratio (1:${slopeRatio.toFixed(2)}) is between 1:12 and 1:20`;
                 }
@@ -427,10 +454,13 @@ function formatResult(feet, inches) {
             }
 
             document.getElementById('slopeResult').innerHTML = `
+                <h3>Ramp Parameters</h3>
                 <span style="color: black;">Slope as a Percentage: <span style="color: red;">${slopePercentage.toFixed(1)}%
                 <br><span style="color: black;">Slope Angle: <span style="color: red;">${slopeAngle.toFixed(1)}°
                 <br><span style="color: black;">Railings Needed?: <span style="color: red;">${railingsNeeded}
                 <br><span style="color: black;">ADA Compliant?: <span style="color: red;">${adaCompliant}
+                <br>
+                <br>Always double check calculations with the <a href='https://up.codes/viewer/new_york/ibc-2018/chapter/10/means-of-egress#1005' target='_blank'>Building Code Section 1005</a>.
             `;
         }
 
@@ -454,23 +484,39 @@ function formatResult(feet, inches) {
             const totalRunWithLandings = totalRun + (numberOfLandings * runWidthInInches);
 
             document.getElementById('stairResult').innerHTML = `
-                <span style="color: black;">Number of Risers: <span style="color: red;">${numberOfSteps}
-                <br><span style="color: black;">Riser height: <span style="color: red;">${formatFractionalInches(actualRiserHeight)}
-                <br><span style="color: black;">Tread depth: <span style="color: red;">11 inches
-                <br>
-                <br><span style="color: black;">Single Run Stair Width (Egress Width):<span style="color: red;">${formatFeetAndInches(runWidthInInches)}
-                <br><span style="color: black;">---or---
-                <br><span style="color: black;">Switchback Stair Shaft Width (Egress Width + 6" Between Runs):<span style="color: red;">${formatFeetAndInches((runWidthInInches*2)+6)}                    
-                <br>
-                <br><span style="color: black;">Run Length Without Landings:<span style="color: red;">${formatFeetAndInches(totalRun)}
-                <br><span style="color: black;">Number of Landings Required:<span style="color: red;">${numberOfLandings} at ${formatFeetAndInches(runWidthInInches)} = ${formatFeetAndInches(numberOfLandings*runWidthInInches)}
-                <br><span style="color: black;">Run Length Including Landings:<span style="color: red;">${formatFeetAndInches(totalRunWithLandings)}
-                <br><span style="color: black;">---or---
-                <br><span style="color: black;">Number of Treads: <span style="color: red;">${Math.ceil(numberOfSteps/2)} plus ${Math.floor(numberOfSteps/2)}
-                <br><span style="color: black;">Switchback Stair Shaft Length (Egress Width + 5" Stringer Return Onto Landing): <span style="color: red;">${formatFeetAndInches((runWidthInInches*2)+10+(Math.ceil(numberOfSteps/2)*11))} (5" might be 3", look at typ dtl)                    
-                <br>
-                <br><span style="color: black;">---Note: All Egress Widths Taken From Outside of Stringers, Typ.
-                `;
+            <div class="fit-columns">  
+                <div class="column-small">
+                    <h3>Stair Parameters</h3>
+                    <span style="color: black;">Number of Risers: <span style="color: red;">${numberOfSteps}
+                    <br><span style="color: black;">Riser Height: <span style="color: red;">${actualRiserHeight.toFixed(3)}" or ${formatFractionalInches(actualRiserHeight)}
+                    <br><span style="color: black;">Tread Depth: <span style="color: red;">11"
+                    <br>
+                    <h3>Occupancy Loads Acheived Per <a href="https://up.codes/viewer/new_york/ibc-2018/chapter/10/means-of-egress#1005.3.1" target="_blank">Section 1005.3.1</a>:</h3>
+                    <span style="color: black;">0.3"/person: <span style="color: red;">${(runWidthInInches*0.03)*100} persons
+                    <br><span style="color: black;">0.2"/person (Sprinklered): <span style="color: red;">${(runWidthInInches*0.02)*100} persons
+                </div>
+                <div class="column-large">
+                    <h3>Single Run Stair</h3>
+                    <span style="color: black;">Single Run Stair Width (Egress Width):<span style="color: red;">${formatFeetAndInches(runWidthInInches)}
+                    <br><span style="color: black;">Run Length Without Landings:<span style="color: red;">${formatFeetAndInches(totalRun)}
+                    <br><span style="color: black;">Number of Landings Required:<span style="color: red;">${numberOfLandings} at ${formatFeetAndInches(runWidthInInches)} = ${formatFeetAndInches(numberOfLandings*runWidthInInches)}
+                    <br><span style="color: black;">Run Length Including Landings:<span style="color: red;">${formatFeetAndInches(totalRunWithLandings)}
+                    <br>${runWidthInInches < 48 && runWidthInInches >= 36 ? "<span style='color: red;'>Warning!: The stair width is less than 48\". Unless the building is sprinklered, the stair IS NOT accessible per <a href='https://up.codes/viewer/new_york/ibc-2018/chapter/10/means-of-egress#1009.3.2' target='_blank'>Section 1009.3.2</a> Make sure at least one means of egress in the building is accessible.</span>" : ""}
+                    <br>${runWidthInInches < 36 ? "<span style='color: red;'>Warning!: The stair width is less than 36\". per <a href='https://up.codes/viewer/new_york/ibc-2018/chapter/10/means-of-egress#1009.3.2' target='_blank'>Section 1009.3.2</a> Make sure at least one means of egress in the building is accessible.</span>" : ""}
+                </div>
+                <div class="column-large">
+                    <h3>Switchback Stair</h3>
+                    <span style="color: black;">Switchback Stair Shaft Width (Egress Width + 6" Between Runs):<span style="color: red;">${formatFeetAndInches((runWidthInInches*2)+6)}
+                    <br><span style="color: black;">Number of Treads: <span style="color: red;">${Math.ceil(numberOfSteps/2)} plus ${Math.floor(numberOfSteps/2)}
+                    <br><span style="color: black;">Switchback Stair Shaft Length (Egress Width + 5" Stringer Return Onto Landing): <span style="color: red;">${formatFeetAndInches((runWidthInInches*2)+10+(Math.ceil(numberOfSteps/2)*11))} (5" might be 3", look at typ dtl)
+                </div>
+            </div>   
+            <br><span style="color: red;">Warnings!: 
+                <br>- All Egress Widths are taken from outside of stringers, typ.
+                <br>- Make sure if there are (2) stair towers, the narrowest stair width is minimally 50% of the overall egress width per <a href='https://up.codes/viewer/new_york/ibc-2018/chapter/10/means-of-egress#1005.5' target='_blank'>Section 1005.5</a>.
+                <br>${totalRiseInInches < 12 ? "<span style='color: red;'>- Per <a href='https://up.codes/viewer/new_york/ibc-2018/chapter/10/means-of-egress#1003.5' target='_blank'>Section 1003.5</a>, for a change in elevation of less than 12\" a ramp must be used.</span>" : ""}
+                <br>- Always double check calculations with the <a href='https://up.codes/viewer/new_york/ibc-2018/chapter/10/means-of-egress#1005' target='_blank'>Building Code Section 1005</a>.
+                    `;
         }
 
         function formatFeetAndInches(totalInches) {
@@ -481,15 +527,17 @@ function formatResult(feet, inches) {
         }
 
         function formatFractionalInches(inches) {
-            const wholePart = Math.floor(inches);
-            const fraction = inches - wholePart;
-            const fractionNumerator = Math.round(fraction * 256);
-            const fractionDenominator = 256;
+        const wholeNumber = Math.floor(inches);
+        const fractionalPart = inches - wholeNumber;
 
-            if (fractionNumerator === 0) {
-                return `${wholePart}"`;
-            }
+        if (fractionalPart === 0) {
+            return `${wholeNumber}"`;
+        } else {
+            const numerator = Math.round(fractionalPart * 256);
+            return `${wholeNumber} ${numerator}/256"`;
         }
+        }
+        
 
         document.addEventListener('DOMContentLoaded', function() {
             const calculateBtn = document.getElementById('calculateBtn');
