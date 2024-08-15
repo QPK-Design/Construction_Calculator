@@ -52,7 +52,7 @@
         <div class="calc-row">
             <div class="calc-input">
                 <input type="number" id="feet" placeholder="Feet"> ft
-                <input type="number" id="inches" placeholder="Inches"> in
+                <input type="text" id="inches1" placeholder="Inches"> in
             </div>
             <button id="convertToDecimalFeetBtn">Convert to Decimal Feet</button>
         </div>
@@ -88,26 +88,26 @@
             <div class="calc-input">
                 <label for="totalRiseFeet"><h3>Floor to Floor Height:</label></h3>
                 <input type="number" id="totalRiseFeet" min="0" placeholder="Feet"> ft
-                <input type="number" id="totalRiseInches" min="0" max="11" placeholder="Inches"> in
+                <input type="text" id="totalRiseInches" min="0" max="11" placeholder="Inches"> in
             </div>
             <div class="calc-input">
                 <label for="runWidthFeet"><h3>Stair Width:</label></h3>
                 <input type="number" id="runWidthFeet" min="0" placeholder="Feet"> ft
-                <input type="number" id="runWidthInches" min="0" max="11" placeholder="Inches"> in
+                <input type="text" id="runWidthInches" min="0" max="11" placeholder="Inches"> in
             </div>
             <div class="calc-input">
                 <label for="spaceBetweenRuns"><h3>Space Between Runs:</label></h3>
-                <input type="number" id="spaceBetweenRuns" min="0" placeholder="4in min"> in
+                <input type="text" id="spaceBetweenRuns" min="0" placeholder="4in min"> in
             </div>
         </div>
         <div class="calc-row">
             <div class="calc-input">
                 <label for="noseToStringerAtLanding"><h3>Nose to Stringer at Landing:</label></h3>
-                <input type="number" id="noseToStringerAtLanding" min="0" placeholder="Inches"> in
+                <input type="text" id="noseToStringerAtLanding" min="0" placeholder="Inches"> in
             </div>
             <div class="calc-input">
                 <label for="treadOffset"><h3>Tread Offset Between Runs:</label></h3>
-                <input type="number" id="treadOffset" min="0" placeholder="ex. 11in"> in
+                <input type="text" id="treadOffset" min="0" placeholder="ex. 11in"> in
             </div>
             <button onclick="calculateStairs()">Calculate Stairs</button>           
         </div>
@@ -162,16 +162,12 @@
             return Math.round(decimal * denominator) / denominator;
         }
 
-        function roundToNearestFraction(decimal, denominator) {
-            return Math.round(decimal * denominator) / denominator;
-        }
-
         function toConstructionFraction(decimal) {
             if (decimal == 0) return '0';
             const wholePart = Math.floor(decimal);
             let fractionalPart = decimal - wholePart;
     
-            if (fractionalPart < 1/512) {  // Using 1/512 as the threshold for rounding to 0
+            if (fractionalPart < 1/256) {  // Using 1/256 as the threshold for rounding to 0
                 return wholePart.toString();
             }
     
@@ -365,6 +361,7 @@ function formatResult(feet, inches) {
             const riseInches = parseFractionalInput(document.getElementById('slopeRiseInches').value);
             const runFeet = parseFloat(document.getElementById('slopeRunFeet').value) || 0;
             const runInches = parseFractionalInput(document.getElementById('slopeRunInches').value);
+            const ADALandingLength = 60; ///Section 1012.6.3
 
             const totalRiseInches = (riseFeet * 12) + riseInches;
             const totalRunInches = (runFeet * 12) + runInches;
@@ -372,13 +369,13 @@ function formatResult(feet, inches) {
             let numberOfLandings = 0;
             // Check if slope is less than 20 before calculating landings
             if (totalRiseInches / ((runFeet * 12) + runInches) > 1/20.0) {
-                numberOfLandings = Math.ceil(totalRunInches / (360) - 1); // 30 ft run before landing is added
+                numberOfLandings = Math.ceil(totalRunInches / (360) - 1); // 30 ft run / 30" of rise before landing is added
             }
 
 
 
             
-            const totalRunInchesWithLandings = totalRunInches + (numberOfLandings * 48);
+            const totalRunInchesWithLandings = totalRunInches + (numberOfLandings * ADALandingLength);
 
             if (totalRiseInches <= 0 || totalRunInches <= 0) {
                 document.getElementById('slopeResult').textContent = "Please enter valid positive numbers for rise and run.";
@@ -406,7 +403,7 @@ function formatResult(feet, inches) {
             const maintain1on20 = totalRiseInches*20
             const maintain1on12 = totalRiseInches*12
 
-            let maintain1on12withLandings = ((maintain1on12) + (Math.floor(maintain1on12 / 360) * 48));
+            let maintain1on12withLandings = ((maintain1on12) + (Math.floor(maintain1on12 / 360) * ADALandingLength));
             if ((maintain1on12 / 360) <= 1) {
                 maintain1on12withLandings = (maintain1on12);
             }
@@ -441,12 +438,12 @@ function formatResult(feet, inches) {
 
         function calculateStairs() {
             const totalRiseFeet = parseFloat(document.getElementById('totalRiseFeet').value) || 0;
-            const totalRiseInches = parseFloat(document.getElementById('totalRiseInches').value) || 0;
+            const totalRiseInches = parseFractionalInput(document.getElementById('totalRiseInches').value) || 0;
             const runWidthFeet = parseFloat(document.getElementById('runWidthFeet').value) || 0;
-            const runWidthInches = parseFloat(document.getElementById('runWidthInches').value) || 0;
-            const spaceBetweenRuns = parseFloat(document.getElementById('spaceBetweenRuns').value) || 0;
-            const noseToStringerAtLanding = parseFloat(document.getElementById('noseToStringerAtLanding').value) || 0;
-            const treadOffset = parseFloat(document.getElementById('treadOffset').value) || 0;
+            const runWidthInches = parseFractionalInput(document.getElementById('runWidthInches').value) || 0;
+            const spaceBetweenRuns = parseFractionalInput(document.getElementById('spaceBetweenRuns').value) || 0;
+            const noseToStringerAtLanding = parseFractionalInput(document.getElementById('noseToStringerAtLanding').value) || 0;
+            const treadOffset = parseFractionalInput(document.getElementById('treadOffset').value) || 0;
 
             const totalRiseInInches = (totalRiseFeet * 12) + totalRiseInches;
             const runWidthInInches = (runWidthFeet * 12) + runWidthInches;
@@ -486,14 +483,12 @@ function formatResult(feet, inches) {
                 </div>
                 <div class="column-large tooltip">
                     <h3>Switchback Stair</h3>
-                    <span style="color: black;">Switchback Stair Shaft Width (Egress Width + 6" Between Runs + 1/4" On Each Side For Constructability):<span style="color: red;">${formatFeetAndInches((runWidthInInches*2)+6+0.5)}
+                    <span style="color: black;">Switchback Stair Shaft Width (Includes 1/4" On Each Side For Constructability):<span style="color: red;">${formatFeetAndInches((runWidthInInches*2)+spaceBetweenRuns+0.5)}
                     <br><span style="color: black;">Number of Treads: <span style="color: red;">${Math.ceil(numberOfSteps/2)} plus ${Math.floor(numberOfSteps/2)}
                     <br><span style="color: black;">Switchback Stair Shaft Length:</span>                       
                     <span style="color: red;">${formatFeetAndInches(((runWidthInInches * 2)) + (noseToStringerAtLanding * 2) + (Math.ceil(numberOfSteps / 2) * 11))}
                         <br>
-                        <span class="tooltiptext">Shaft Length is based on typical intermediate landing dtl. 2" of the stringer
-                        <br> 
-                        <br>in that dtl counts as egress width in this calculation.</span> 
+                        <span class="tooltiptext">Shaft Length is based on typical intermediate landing dtl. 2" of the stringer in that dtl counts as egress width in this calculation.</span> 
                 </div>
             </div>   
             <br><span style="color: red;">Warnings!: 
