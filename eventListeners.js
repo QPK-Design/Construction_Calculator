@@ -1,4 +1,7 @@
-export function setupEventListeners() {
+///this is not connected to calculators.js yet
+
+
+///export function setupEventListeners() {
     const calculateBtn = document.getElementById('calculateBtn');
     const convertBtn = document.getElementById('convertBtn');
     const clearHistoryBtn = document.getElementById('clearHistoryBtn');
@@ -40,4 +43,4 @@ export function setupEventListeners() {
             });
         }
     });
-}
+///}

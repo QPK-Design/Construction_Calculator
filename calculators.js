@@ -1,3 +1,6 @@
+///import { setupEventListeners } from "./eventListeners";
+///console.log (setupEventListeners);
+
 let calculationHistory = [];
 
         function addToHistory(calculation) {
@@ -225,10 +228,7 @@ function formatResult(feet, inches) {
             if (totalRiseInches / ((runFeet * 12) + runInches) > 1/20.0) {
                 numberOfLandings = Math.ceil(totalRunInches / (360) - 1); // 30 ft run / 30" of rise before landing is added
             }
-
-
-
-            
+           
             const totalRunInchesWithLandings = totalRunInches + (numberOfLandings * ADALandingLength);
 
             if (totalRiseInches <= 0 || totalRunInches <= 0) {
@@ -496,6 +496,48 @@ function formatResult(feet, inches) {
                     if (event.key === 'Enter') {
                         event.preventDefault();
                         convertToDecimalFeet();
+                    }
+                });
+            }
+        });
+        
+        // Add keydown event listeners for 'calculateSlope' Function
+        const calculateSlopeInputs = ['slopeRiseFeet', 'slopeRiseInches', 'slopeRunFeet', 'slopeRunInches', 'rampWidthFeet', 'rampWidthInches'];
+        calculateSlopeInputs.forEach(id => {
+            const inputElement = document.getElementById(id);
+            if (inputElement) {
+                inputElement.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        calculateSlope();
+                    }
+                });
+            }
+        });
+
+        // Add keydown event listeners for 'calculateStairs' Function
+        const calculateStairsInputs = ['totalRiseFeet', 'totalRiseInches', 'runWidthFeet', 'runWidthInches', 'spaceBetweenRuns', 'noseToStringerAtLanding', 'treadOffset'];
+        calculateStairsInputs.forEach(id => {
+            const inputElement = document.getElementById(id);
+            if (inputElement) {
+                inputElement.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        calculateStairs();
+                    }
+                });
+            }
+        });
+
+        // Add keydown event listeners for 'convertGauge' Function
+        const convertGaugeInputs = ['material', 'mtlGauge'];
+        convertGaugeInputs.forEach(id => {
+            const inputElement = document.getElementById(id);
+            if (inputElement) {
+                inputElement.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        convertGauge();
                     }
                 });
             }
