@@ -1,6 +1,3 @@
-///import { setupEventListeners } from "./eventListeners";
-///console.log (setupEventListeners);
-
 let calculationHistory = [];
 
         function addToHistory(calculation) {
@@ -106,41 +103,45 @@ function formatResult(feet, inches) {
     return result || '0"';
 }
 
-        function calculate() {
-            const feet1 = parseFloat(document.getElementById('feet1').value) || 0;
-            const inches1 = parseFractionalInput(document.getElementById('inches1').value);
-            const feet2 = parseFloat(document.getElementById('feet2').value) || 0;
-            const inches2 = parseFractionalInput(document.getElementById('inches2').value);
-            const operation = document.getElementById('operation').value;
+    function calculate() {
+    const feet1 = parseFloat(document.getElementById('feet1').value) || 0;
+    const inches1 = parseFractionalInput(document.getElementById('inches1').value);
+    const feet2 = parseFloat(document.getElementById('feet2').value) || 0;
+    const inches2 = parseFractionalInput(document.getElementById('inches2').value);
+    const operation = document.getElementById('operation').value;
 
-            const totalInches1 = feet1 * 12 + inches1;
-            const totalInches2 = feet2 * 12 + inches2;
+    const totalInches1 = feet1 * 12 + inches1;
+    const totalInches2 = feet2 * 12 + inches2;
 
-            let result;
-            switch (operation) {
-                case '+':
-                    result = totalInches1 + totalInches2;
-                    break;
-                case '-':
-                    result = totalInches1 - totalInches2;
-                    break;
-                case '*':
-                    result = totalInches1 * totalInches2;
-                    break;
-                case '/':
-                    result = totalInches1 / totalInches2;
-                    break;
-            }
+    let result;
+    switch (operation) {
+        case '+':
+            result = totalInches1 + totalInches2;
+            break;
+        case '-':
+            result = totalInches1 - totalInches2;
+            break;
+        case '*':
+            const decimalForMultDiv = parseFloat(document.getElementById('decimalForMultDiv').value) || 0; // Default to 1 if empty
+            result = totalInches1 * decimalForMultDiv;
+            break;
+        case '/':
+            const decimalDivisor = parseFloat(document.getElementById('decimalForMultDiv').value) || 0; // Default to 1 if empty
+            result = totalInches1 / decimalDivisor;
+            break;
+        default:
+            result = 0; // Handle unexpected operations
+    }
 
-            const resultFeet = Math.floor(result / 12);
-            const resultInches = result % 12;
+    const resultFeet = Math.floor(result / 12);
+    const resultInches = result % 12;
 
-            const resultText = `<span style="color: black;">Result: <span style="color: red;">${formatResult(resultFeet, resultInches)}`;
-            document.getElementById('result').innerHTML = resultText;
+    const resultText = `<span style="color: black;">Result: <span style="color: red;">${formatResult(resultFeet, resultInches)}</span></span>`;
+    document.getElementById('result').innerHTML = resultText;
 
-            const calculationText = `${formatResult(feet1, inches1)} ${operation} ${formatResult(feet2, inches2)} = ${formatResult(resultFeet, resultInches)}`;
-            addToHistory(calculationText);
-        }
+    const calculationText = `${formatResult(feet1, inches1)} ${operation} ${operation === '*' || operation === '/' ? decimalInput : formatResult(feet2, inches2)} = ${formatResult(resultFeet, resultInches)}`;
+    addToHistory(calculationText);
+}
 
         function standardToMetric() {
             const feet = parseFloat(document.getElementById('feetToConvert').value) || 0;
@@ -460,7 +461,7 @@ function formatResult(feet, inches) {
         if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', clearHistory);
 
         // Add keydown event listeners for 'calculate' Function
-        const calculatorInputs = ['feet1', 'inches1', 'feet2', 'inches2']; ///create new const for 'inputs' and list all input fields from the HTML by name
+        const calculatorInputs = ['feet1', 'inches1', 'feet2', 'inches2', 'decimalForMultDiv']; ///create new const for 'inputs' and list all input fields from the HTML by name
         calculatorInputs.forEach(id => {
             const inputElement = document.getElementById(id);
             if (inputElement) {

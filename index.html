@@ -11,27 +11,32 @@
     
     <div class="calculator">
         <h2>Feet and Inches Calculator</h2>
-        <div class="calc-row">
-            <div class="calc-input">
-                <input type="number" id="feet1" placeholder="Feet"> ft
+        <div class="fit-columns">
+            <div class="column-small">
+                <input type="text" id="feet1" placeholder="Feet"> ft
                 <input type="text" id="inches1" placeholder="Inches"> in
             </div>
-        </div>
-        <div class="calc-row">
-        <select id="operation">
-            <option value="+">+</option>
-            <option value="-">-</option>
-            <option value="*">×</option>
-            <option value="/">÷</option>
-        </select>
-        </div>
-        <div class="calc-row">
-            <div class="calc-input">
-                <input type="number" id="feet2" placeholder="Feet"> ft
-                <input type="text" id="inches2" placeholder="Inches"> in
+            <div class="column-small">
+            <select id="operation">
+                <option value="+">+</option>
+                <option value="-">-</option>
+                <option value="*">×</option>
+                <option value="/">÷</option>
+            </select>
             </div>
+            <div class="column-small">
+                <input type="text" id="feet2" placeholder="Feet"> ft
+                <input type="text" id="inches2" placeholder="Inches"> in
+                <div class="calc-row">
+                    <div class="calc-input">
+                        <br><br><input type="text" id="decimalForMultDiv" style="width: 170px" placeholder="Decimal Number for x or ÷">
+                    </div>
+                </div>                
+            </div>
+            <div>
             <button id="calculateBtn">Calculate</button>
-        </div>          
+            </div>
+        </div>         
         <p id="result"></p>
     </div>
 
