@@ -467,10 +467,20 @@ function convertGauge() {
     // Format the result
     const formattedHeight = toConstructionFraction(roundedHeight);
 
+    // Calculate slope percentage: (rise / run) × 100
+    // Rise = slopePerFoot inches, Run = 12 inches
+    const slopeRatio = slopePerFoot / 12;
+    const slopePercentage = slopeRatio * 100;
+
+    // Calculate angle in degrees: arctan(rise/run)
+    const slopeAngle = Math.atan(slopeRatio) * (180 / Math.PI);
+
     const resultText = `
         <span style="color: black;">Slope: <span style="color: red;">${slopePerFoot}" /foot
+        <br><span style="color: black;">Slope Percentage: <span style="color: red;">${slopePercentage.toFixed(2)}%
+        <br><span style="color: black;">Slope Angle: <span style="color: red;">${slopeAngle.toFixed(2)}°
         <br><span style="color: black;">Length: <span style="color: red;">${formatFeetAndInches(totalLengthInches)}
-        <br><span style="color: black;">Maximum Height at End: <span style="color: red;">${formattedHeight} "
+        <br><span style="color: black;">Maximum Height at End: <span style="color: red;">${formattedHeight}"
     `;
 
     document.getElementById('taperedRoofResult').innerHTML = resultText;
