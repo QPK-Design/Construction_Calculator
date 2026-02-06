@@ -400,50 +400,84 @@ function formatResult(feet, inches) {
                 25: 0.0179, 26: 0.0159, 27: 0.0142, 28: 0.0126, 29: 0.0113, 30: 0.0100
             }};
 
-            function convertGauge() {
-            console.log('Calculate function called');
+function convertGauge() {
+    console.log('Calculate function called');
+
+    const materialSelect = document.getElementById('material');
+    const materialValue = materialSelect.value.trim();
+    const gauge = parseInt(document.getElementById('mtlGauge').value);
+
+    const materialLabels = {
+        stainless: "Stainless Steel",
+        galvanized: "Galvanized Steel",
+        sheet: "Sheet Steel",
+        aluminum: "Aluminum"
+    };
+
+    if (!materialValue) {
+        const errorText = 'Material cannot be empty.';
+        console.log('Error:', errorText);
+        document.getElementById('gaugeResult').textContent = errorText;
+        return;
+    }
+
+    if (isNaN(gauge) || gauge < 3 || gauge > 30) {
+        const errorText = 'Invalid gauge number. Please enter a number between 3 and 30.';
+        console.log('Error:', errorText);
+        document.getElementById('gaugeResult').textContent = errorText;
+        return;
+    }
+
+    // Get the display name for the selected material
+    const materialLabel = materialLabels[materialValue] || materialValue;
+
+    if (materialValue in gaugesToThickness && gauge >= 3 && gauge <= 30) {
+        const thickness = gaugesToThickness[materialValue][gauge];
+        const thicknessInches = thickness.toFixed(4);
+        const thicknessMm = (thickness * 25.4).toFixed(2);
+        const resultText = `${materialLabel} Gauge ${gauge} = <span class="red-result-text">${thicknessInches} inches (${thicknessMm} mm)</span>`;
+        console.log('Result:', resultText);
+        document.getElementById('gaugeResult').innerHTML = resultText;
+    } else {
+        const errorText = 'Invalid input. Please check the material and gauge number.';
+        console.log('Error:', errorText);
+        document.getElementById('gaugeResult').textContent = errorText;
+    }
+}
+                function calculateTaperedRoof() {
+    const slopePerFoot = parseFloat(document.getElementById('roofSlope').value) || 0.25;
+    const feet = parseFloat(document.getElementById('roofLengthFeet').value) || 0;
+    const inches = parseFractionalInput(document.getElementById('roofLengthInches').value || "0");
     
-            const materialSelect = document.getElementById('material');
-            const materialValue = materialSelect.value.trim();
-            const gauge = parseInt(document.getElementById('mtlGauge').value);
-    
-            const materialLabels = {
-                stainless: "Stainless Steel",
-                galvanized: "Galvanized Steel",
-                sheet: "Sheet Steel",
-                aluminum: "Aluminum"
-            };
+    const totalLengthInches = feet * 12 + inches;
 
-            if (!materialValue) {
-                const errorText = 'Material cannot be empty.';
-                console.log('Error:', errorText);
-                document.getElementById('gaugeResult').textContent = errorText;
-                return;
-            }
+    if (totalLengthInches <= 0) {
+        document.getElementById('taperedRoofResult').innerHTML =
+            '<span style="color: red;">Please enter a valid positive length.</span>';
+        return;
+    }
 
-            if (isNaN(gauge) || gauge < 3 || gauge > 30) {
-                const errorText = 'Invalid gauge number. Please enter a number between 3 and 30.';
-                console.log('Error:', errorText);
-                document.getElementById('gaugeResult').textContent = errorText;
-                return;
-            }
+    // Calculate max height: slope per foot * total feet
+    const totalFeet = totalLengthInches / 12;
+    const maxHeightInches = slopePerFoot * totalFeet;
 
-            // Get the display name for the selected material
-            const materialLabel = materialLabels[materialValue] || materialValue;
+    // Round to nearest 1/8"
+    const roundedHeight = Math.round(maxHeightInches * 8) / 8;
 
-            if (materialValue in gaugesToThickness && gauge >= 3 && gauge <= 30) {
-            const thickness = gaugesToThickness[materialValue][gauge];
-            const thicknessInches = thickness.toFixed(4);
-            const thicknessMm = (thickness * 25.4).toFixed(2);
-            const resultText = `${materialLabel} Gauge ${gauge} = <span class="red-result-text">${thicknessInches} inches (${thicknessMm} mm)</span>`;
-            console.log('Result:', resultText);
-            document.getElementById('gaugeResult').innerHTML = resultText;
-        } else {
-            const errorText = 'Invalid input. Please check the material and gauge number.';
-            console.log('Error:', errorText);
-            document.getElementById('gaugeResult').textContent = errorText;
-        }
-        }
+    // Format the result
+    const formattedHeight = toConstructionFraction(roundedHeight);
+
+    const resultText = `
+        <span style="color: black;">Slope: <span style="color: red;">${slopePerFoot}" /foot
+        <br><span style="color: black;">Length: <span style="color: red;">${formatFeetAndInches(totalLengthInches)}
+        <br><span style="color: black;">Maximum Height at End: <span style="color: red;">${formattedHeight} "
+    `;
+
+    document.getElementById('taperedRoofResult').innerHTML = resultText;
+
+    const calculationText = `Tapered Roof: ${slopePerFoot}"/ft over ${formatFeetAndInches(totalLengthInches)} = ${formattedHeight} max height`;
+    addToHistory(calculationText);
+}
 
         document.addEventListener('DOMContentLoaded', function() {
         const calculateBtn = document.getElementById('calculateBtn');
@@ -543,4 +577,20 @@ function formatResult(feet, inches) {
                 });
             }
         });
+            const calculateTaperedRoofBtn = document.getElementById('calculateTaperedRoofBtn');
+            if (calculateTaperedRoofBtn) calculateTaperedRoofBtn.addEventListener('click', calculateTaperedRoof);
+
+            // Add keydown event listeners for 'calculateTaperedRoof' Function
+            const calculateTaperedRoofInputs = ['roofSlope', 'roofLengthFeet', 'roofLengthInches'];
+            calculateTaperedRoofInputs.forEach(id => {
+                const inputElement = document.getElementById(id);
+                if (inputElement) {
+                    inputElement.addEventListener('keydown', function (event) {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            calculateTaperedRoof();
+                        }
+                    });
+                }
+            });
 });

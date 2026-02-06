@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>Architecture Calculators</h1>
-    
+
     <div class="calculator">
         <h2>Feet and Inches Calculator</h2>
         <div class="fit-columns">
@@ -17,12 +17,12 @@
                 <input type="text" id="inches1" placeholder="Inches"> in
             </div>
             <div class="column-small">
-            <select id="operation">
-                <option value="+">+</option>
-                <option value="-">-</option>
-                <option value="*">×</option>
-                <option value="/">÷</option>
-            </select>
+                <select id="operation">
+                    <option value="+">+</option>
+                    <option value="-">-</option>
+                    <option value="*">×</option>
+                    <option value="/">÷</option>
+                </select>
             </div>
             <div class="column-small">
                 <input type="text" id="feet2" placeholder="Feet"> ft
@@ -31,12 +31,12 @@
                     <div class="calc-input">
                         <br><br><input type="text" id="decimalForMultDiv" style="width: 170px" placeholder="Decimal Number for x or ÷">
                     </div>
-                </div>                
+                </div>
             </div>
             <div>
-            <button id="calculateBtn">Calculate</button>
+                <button id="calculateBtn">Calculate</button>
             </div>
-        </div>         
+        </div>
         <p id="result"></p>
     </div>
 
@@ -114,12 +114,12 @@
                 <label for="treadOffset"><h3>Tread Offset Between Runs:</label></h3>
                 <input type="text" id="treadOffset" min="0" placeholder="ex. 11in"> in
             </div>
-            <button onclick="calculateStairs()">Calculate Stairs</button>           
+            <button onclick="calculateStairs()">Calculate Stairs</button>
         </div>
         <div class="calc-row">
             <div id="stairResult"></div>
         </div>
-    </div>    
+    </div>
 
     <div class="gauge converter">
         <h2>Metal Gauge Converter</h2>
@@ -138,6 +138,23 @@
             <button id="convertGaugeBtn">Convert Gauge to Thickness</button>
         </div>
         <div id="gaugeResult"></div>
+    </div>
+
+    <div class="tapered-roof calculator">
+        <h2>Tapered Roof Insulation Max Height Calculator</h2>
+        <div class="calc-row">
+            <div class="calc-input">
+                <label for="roofSlope"><h3>Slope (per foot):</label></h3>
+                <input type="text" id="roofSlope" placeholder="0.25" value="0.25"> in/ft
+            </div>
+            <div class="calc-input">
+                <label for="roofLengthFeet"><h3>Length:</label></h3>
+                <input type="number" id="roofLengthFeet" placeholder="Feet"> ft
+                <input type="text" id="roofLengthInches" placeholder="Inches"> in
+            </div>
+            <button id="calculateTaperedRoofBtn">Calculate Max Height</button>
+        </div>
+        <div id="taperedRoofResult"></div>
     </div>
 
     <div class="history">
